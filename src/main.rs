@@ -2,10 +2,11 @@ extern crate reqwest;
 extern crate select;
 
 use std::env;
+use std::error::Error;
 use std::process::exit;
 
 use select::document::Document;
-use select::predicate::{Name};
+use select::predicate::Name;
 
 use futures::executor::block_on;
 
@@ -23,7 +24,7 @@ async fn main() {
     }
 
     let mut current_floor = 0;
-    let mut queue = vec![&args[1]];  // queue with first url
+    let mut queue = vec![&args[1]]; // queue with first url
     let mut siblings_on_current_floor = 1;
 
     while current_floor <= MAX_HEIGHT && !queue.is_empty() {
@@ -31,10 +32,11 @@ async fn main() {
             let url = queue.remove(0);
             println!("{}", url);
             let resp = reqwest::get(url).await.unwrap().text().await.unwrap();
+
             let doc = Document::from(resp.as_str());
             for node in doc.select(Name("a")) {
                 println!("{}", node.attr("href").unwrap());
-            };
+            }
         }
         current_floor += 1;
     }
