@@ -42,6 +42,7 @@ async fn main() {
 
             let text = resp.unwrap().text().await;
             if text.is_err() {
+                println!("Failed to parse {}", url);
                continue;
             }
 
