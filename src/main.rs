@@ -10,7 +10,6 @@ use select::document::Document;
 use select::predicate::{Name};
 use std::collections::HashSet;
 
-// TODO: сохранять посещенные ссылки
 // TODO: оставаться внутри хоста
 
 #[tokio::main]
