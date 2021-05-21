@@ -26,6 +26,8 @@ async fn main() {
     let mut queue = vec![Url::parse(&args[1])
         .expect("Incorrect start url")];
 
+    let mut visited_pages: HashSet<Url> = HashSet::new();
+
     let mut current_floor = 0;
     let mut siblings_on_current_floor = 1;
     let mut siblings_on_next_floor = 0;
@@ -33,6 +35,7 @@ async fn main() {
     while current_floor <= MAX_HEIGHT && !queue.is_empty() {
         for _ in 0..siblings_on_current_floor {
             let url = queue.remove(0);
+            visited_pages.insert(url.clone());
 
             let resp = reqwest::get(url.clone()).await;
             if resp.is_err() {
@@ -51,6 +54,10 @@ async fn main() {
             for node in doc.select(Name("a")) {
                 if let Some(href) = node.attr("href") {
                     if href.starts_with('#') {
+                        continue;
+                    }
+
+                    if visited_pages.contains(&url.clone()) {
                         continue;
                     }
 
