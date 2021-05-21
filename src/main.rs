@@ -8,6 +8,7 @@ use reqwest::Url;
 
 use select::document::Document;
 use select::predicate::{Name};
+use std::fs::read;
 
 // TODO: сохранять посещенные ссылки
 // TODO: оставаться внутри хоста
@@ -33,14 +34,18 @@ async fn main() {
         for _ in 0..siblings_on_current_floor {
             let url = queue.remove(0);
 
-            let resp = reqwest::get(url.clone())
-                .await
-                .unwrap()
-                .text()
-                .await
-                .unwrap();
+            let resp = reqwest::get(url.clone()).await;
+            if resp.is_err() {
+                println!("Failed to download {}", url);
+                continue;
+            }
 
-            let doc = Document::from(resp.as_str());
+            let text = resp.unwrap().text().await;
+            if text.is_err() {
+               continue;
+            }
+
+            let doc = Document::from(text.unwrap().as_str());
 
             for node in doc.select(Name("a")) {
                 if let Some(href) = node.attr("href") {
