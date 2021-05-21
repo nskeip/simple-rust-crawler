@@ -2,13 +2,13 @@ extern crate reqwest;
 extern crate select;
 
 use std::env;
+use std::collections::HashSet;
 use std::process::exit;
 
 use reqwest::Url;
 
 use select::document::Document;
 use select::predicate::{Name};
-use std::collections::HashSet;
 
 #[tokio::main]
 async fn main() {
