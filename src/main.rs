@@ -57,11 +57,10 @@ async fn main() {
                         continue;
                     }
 
-                    if visited_pages.contains(&url.clone()) {
-                        continue;
-                    }
-
                     if let Ok(new_absolute_url) = url.join(href) {
+                        if visited_pages.contains(&new_absolute_url.clone()) {
+                            continue;
+                        }
                         queue.push(new_absolute_url);
                         siblings_on_next_floor += 1;
                     }
