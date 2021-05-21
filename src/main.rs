@@ -10,8 +10,6 @@ use select::document::Document;
 use select::predicate::{Name};
 use std::collections::HashSet;
 
-// TODO: оставаться внутри хоста
-
 #[tokio::main]
 async fn main() {
     const MAX_HEIGHT: i8 = 1;
@@ -22,8 +20,9 @@ async fn main() {
         exit(1);
     }
 
-    let mut queue = vec![Url::parse(&args[1])
-        .expect("Incorrect start url")];
+    let start_url = Url::parse(&args[1]).expect("Incorrect start url");
+    let start_domain = start_url.domain().expect("Strange domain, you know?").to_string();
+    let mut queue = vec![start_url];
 
     let mut visited_pages: HashSet<Url> = HashSet::new();
 
@@ -57,6 +56,12 @@ async fn main() {
                     }
 
                     if let Ok(new_absolute_url) = url.join(href) {
+                        if let Some(new_domain) = new_absolute_url.domain() {
+                            if new_domain.to_string() != start_domain {
+                                continue;
+                            }
+                        }
+
                         if visited_pages.contains(&new_absolute_url.clone()) {
                             continue;
                         }
