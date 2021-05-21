@@ -8,14 +8,14 @@ use reqwest::Url;
 
 use select::document::Document;
 use select::predicate::{Name};
-use std::fs::read;
+use std::collections::HashSet;
 
 // TODO: сохранять посещенные ссылки
 // TODO: оставаться внутри хоста
 
 #[tokio::main]
 async fn main() {
-    const MAX_HEIGHT: i8 = 0;
+    const MAX_HEIGHT: i8 = 1;
 
     let args: Vec<String> = env::args().collect();
     if args.iter().count() == 1 {
