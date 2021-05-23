@@ -35,10 +35,10 @@ async fn main() {
     while current_floor <= MAX_HEIGHT && !queue.is_empty() {
         let mut futures = Vec::with_capacity(siblings_on_current_floor);
         for _ in 0..siblings_on_current_floor {
-            let future = tokio::spawn(async move {
-                let url = queue.remove(0);
-                visited_pages.insert(url.clone());
+            let url = queue.remove(0);
+            visited_pages.insert(url.clone());
 
+            let future = tokio::spawn(async move {
                 let resp = reqwest::get(url.clone()).await;
                 if resp.is_err() {
                     println!("Failed to download {}", url);
