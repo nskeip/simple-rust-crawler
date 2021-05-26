@@ -41,7 +41,7 @@ async fn run(start_url: Url) -> Result<(), Error> {
 
     let mut current_floor_queue: Vec<Url>;
     let mut next_floor_queue = vec![start_url.clone()];
-    let mut visited_pages: HashSet<Url> = HashSet::new();
+    let mut known_pages: HashSet<Url> = HashSet::new();
 
     let mut current_floor = 0;
     let mut siblings_on_current_floor = 1;
@@ -57,10 +57,6 @@ async fn run(start_url: Url) -> Result<(), Error> {
 
         // делаем фьючи для скачивания страниц
         for url in current_floor_queue.clone() {
-            if visited_pages.contains(&url) {
-                continue;
-            }
-            visited_pages.insert(url.clone());
             proc_url_futures.push(process_url(url));
         }
 
@@ -84,6 +80,11 @@ async fn run(start_url: Url) -> Result<(), Error> {
                                 if new_domain.to_string() != start_domain {
                                     continue;
                                 }
+                            }
+                            if known_pages.contains(&new_absolute_url) {
+                                continue;
+                            } else {
+                                known_pages.insert(new_absolute_url.clone());
                             }
                             println!("{}", new_absolute_url);
                             next_floor_queue.push(new_absolute_url);
