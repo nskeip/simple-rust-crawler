@@ -62,7 +62,7 @@ async fn run(start_url: Url) -> Result<(), Error> {
             proc_url_futures.push(process_url(url));
         }
 
-        let proc_results = futures::future::join_all(proc_url_futures).await;
+        let proc_results = join_all(proc_url_futures).await;
         for (i, r) in proc_results.iter().enumerate() {
             if let Ok((page_text, page_links)) = r {
                 for href in page_links {
