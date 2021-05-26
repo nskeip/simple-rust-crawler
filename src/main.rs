@@ -44,7 +44,6 @@ async fn run(start_url: Url) -> Result<(), Error> {
     let mut known_pages: HashSet<Url> = HashSet::new();
 
     let mut current_floor = 0;
-    let mut siblings_on_current_floor = 1;
 
     while current_floor <= MAX_HEIGHT {
         println!("Floor #{}", current_floor);
@@ -52,8 +51,7 @@ async fn run(start_url: Url) -> Result<(), Error> {
         current_floor_queue = next_floor_queue;
         next_floor_queue = Vec::new();
 
-        let mut proc_url_futures =
-            Vec::with_capacity(siblings_on_current_floor);
+        let mut proc_url_futures = Vec::new();
 
         // делаем фьючи для скачивания страниц
         for url in current_floor_queue.clone() {
