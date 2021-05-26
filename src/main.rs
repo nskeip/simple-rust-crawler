@@ -47,13 +47,15 @@ async fn run(start_url: Url) -> Result<(), Error> {
     let mut siblings_on_current_floor = 1;
 
     while current_floor <= MAX_HEIGHT {
+        println!("Floor #{}", current_floor);
+
         current_floor_queue = next_floor_queue;
         next_floor_queue = Vec::new();
 
         let mut proc_url_futures =
             Vec::with_capacity(siblings_on_current_floor);
 
-        // собираем все подряд
+        // делаем фьючи для скачивания страниц
         for url in current_floor_queue.clone() {
             if visited_pages.contains(&url) {
                 continue;
@@ -62,23 +64,30 @@ async fn run(start_url: Url) -> Result<(), Error> {
             proc_url_futures.push(process_url(url));
         }
 
+        // обрабатываем результаты закачки + создаем новую очередь
         let proc_results = join_all(proc_url_futures).await;
         for (i, r) in proc_results.iter().enumerate() {
             if let Ok((page_text, page_links)) = r {
-                for href in page_links {
-                    if href.starts_with('#') {
-                        continue;
-                    }
+                // TODO: сохранять страницы в файлы
 
-                    let url = current_floor_queue[i].clone();
-
-                    if let Ok(new_absolute_url) = url.join(href) {
-                        if let Some(new_domain) = new_absolute_url.domain() {
-                            if new_domain.to_string() != start_domain {
-                                continue;
-                            }
+                // обработка ссылок
+                if current_floor < MAX_HEIGHT {
+                    for href in page_links {
+                        if href.starts_with('#') {
+                            continue;
                         }
-                        next_floor_queue.push(new_absolute_url);
+
+                        let url = current_floor_queue[i].clone();
+
+                        if let Ok(new_absolute_url) = url.join(href) {
+                            if let Some(new_domain) = new_absolute_url.domain() {
+                                if new_domain.to_string() != start_domain {
+                                    continue;
+                                }
+                            }
+                            println!("{}", new_absolute_url);
+                            next_floor_queue.push(new_absolute_url);
+                        }
                     }
                 }
             }
